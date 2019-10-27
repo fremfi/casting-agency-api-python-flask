@@ -50,3 +50,15 @@ This will install all of the required packages we selected within the `requireme
 
 ##### Swagger Documentation
 - https://fremfi-casting-agency.herokuapp.com/
+
+
+##### Login URL
+- https://fremfi.auth0.com/authorize?response_type=token&client_id=UxNviyb8tyHeh1dI0Xsk29jz06dQETea&redirect_uri=https://fremfi-casting-agency.herokuapp.com/callback&audience=castingagencyauth
+
+##### Logout URL
+- https://fremfi.auth0.com/v2/logout?client_id=UxNviyb8tyHeh1dI0Xsk29jz06dQETea&returnTo=https://fremfi-casting-agency.herokuapp.com/logout
+
+##### Users, Roles & Passwords for testing
+- Executive Producer; exectuvieproducer@fremfi.com Executive2@
+- Casting Assistant; castingassistant@fremfi.com Casting2@
+- Casting Director; castingdirector@fremfi.com Director2@
