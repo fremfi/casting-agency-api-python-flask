@@ -18,7 +18,7 @@ class MovieTestCase(unittest.TestCase):
         self.app.register_blueprint(blueprint)
         self.client = self.app.test_client
         # Executive Director Role Token
-        self.exec_dir_headers = {'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik1qWTNOalV4TnpCRE1FWXpRalJEUTBRelF6VkRSVGMwUWpNM1F6aEVRak01TnpBM1JqVXpRdyJ9.eyJpc3MiOiJodHRwczovL2ZyZW1maS5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWRiNGM0NjBlOWMwNzQwZDYxMzczYWQ5IiwiYXVkIjoiY2FzdGluZ2FnZW5jeWF1dGgiLCJpYXQiOjE1NzIxMzk3ODgsImV4cCI6MTU3MjE0Njk4OCwiYXpwIjoiVXhOdml5Yjh0eUhlaDFkSTBYc2syOWp6MDZkUUVUZWEiLCJzY29wZSI6IiIsInBlcm1pc3Npb25zIjpbImNyZWF0ZTphY3RvciIsImNyZWF0ZTptb3ZpZSIsImRlbGV0ZTphY3RvciIsImRlbGV0ZTptb3ZpZSIsImdldDphY3RvcnMiLCJnZXQ6bW92aWVzIiwidXBkYXRlOmFjdG9yIiwidXBkYXRlOm1vdmllIl19.n8GfKFCdoRtW_APE2d-8M6RtanNHFL465-gRAMqSFtKr5dlB1GiEsbVtmoiU84lsm5DgDnbg49_ITWjv7Z-ntk-if5ehv1Zg0QivOF4bpOpl_a19mmB77c_3uqNF54sJM5G6f6uK5Q6Hw9fv_Qb7HBwUochcAMirvdnjdBSRbUxHDS90V1MzpyuSn568NNt56iNvWUbNcX1UqB8UEAFfgwUWTpOF_gQed0lRWRXAtMQeFiQiCiX4qWReqCpAj4XXD6ia7h-h-7BpbxV5vuAnAhwj3HxbG9IQiFNurtneaskIm9eoWg-fmqClr6I9OUMFFlrFqlpbq0B8FPpI5Za74A'}
+        self.exec_dir_headers = {'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik1qWTNOalV4TnpCRE1FWXpRalJEUTBRelF6VkRSVGMwUWpNM1F6aEVRak01TnpBM1JqVXpRdyJ9.eyJpc3MiOiJodHRwczovL2ZyZW1maS5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWRiNGM0NjBlOWMwNzQwZDYxMzczYWQ5IiwiYXVkIjoiY2FzdGluZ2FnZW5jeWF1dGgiLCJpYXQiOjE1NzIxODc2NDYsImV4cCI6MTU3MjE5NDg0NiwiYXpwIjoiVXhOdml5Yjh0eUhlaDFkSTBYc2syOWp6MDZkUUVUZWEiLCJzY29wZSI6IiIsInBlcm1pc3Npb25zIjpbImNyZWF0ZTphY3RvciIsImNyZWF0ZTptb3ZpZSIsImRlbGV0ZTphY3RvciIsImRlbGV0ZTptb3ZpZSIsImdldDphY3RvcnMiLCJnZXQ6bW92aWVzIiwidXBkYXRlOmFjdG9yIiwidXBkYXRlOm1vdmllIl19.SNzqtGmDDaGwEDrtzwrFe09CbUocAJ7vMrKY-xqw6o6BvDCruI4axV2x-mqEQLmYbsxQRyaMaCnPP5pHWK5DZjlSYaGjcIf0SUOTlK5v-CqGoeieQ4HW9ua0uFyfFmwKB6UqeI-2tyy03mEcfGlkIyzU08TOT9rykyNqzo47KI-NWJzSoUjyJ-4swHaXryD8vKgSV-MxGpryLqQ1_OzYQ7BQbBl-XPI939Pkk27MbpRSJznkcQI6LfwSHniELGHZI-TC-m_2LioF_kA1YhmPsBoLAhge5LT3fFWRLL8KWLpHrUmpSsj-ufAmV_1OHsPJvDL8_1vRRwRB-ZZk9CN3jg'}  # nopep8
 
         with self.app.app_context():
             self.db = SQLAlchemy()
@@ -72,30 +72,30 @@ class MovieTestCase(unittest.TestCase):
         updated_movie = {
             "title": "New Test Movie"
         }
-        res = (self.client().patch('/movies/41',
+        res = (self.client().patch('/movies/1',
                headers=self.exec_dir_headers, json=updated_movie))
         data = json.loads(res.data)
 
-        movie = Movie.query.filter(Movie._id == 41).first()
+        movie = Movie.query.filter(Movie._id == 1).first()
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(movie.title, updated_movie["title"])
         self.assertEqual(data['title'], updated_movie["title"])
 
-    # def test_delete_movie(self):
-    #     res = (self.client().delete('/movies/42',
-    #            headers=self.exec_dir_headers))
+    def test_delete_movie(self):
+        res = (self.client().delete('/movies/2',
+               headers=self.exec_dir_headers))
 
-    #     movie = Movie.query.filter(Movie._id == 42).one_or_none()
+        movie = Movie.query.filter(Movie._id == 2).one_or_none()
 
-    #     self.assertEqual(res.status_code, 204)
-    #     self.assertEqual(movie, None)
+        self.assertEqual(res.status_code, 204)
+        self.assertEqual(movie, None)
 
-    # def test_404_sent_if_question_being_deleted_does_not_exist(self):
-    #     res = (self.client().delete('/movies/1000',
-    #            headers=self.exec_dir_headers))
+    def test_404_sent_if_question_being_deleted_does_not_exist(self):
+        res = (self.client().delete('/movies/1000',
+               headers=self.exec_dir_headers))
 
-    #     self.assertEqual(res.status_code, 404)
+        self.assertEqual(res.status_code, 404)
 
 
 if __name__ == "__main__":
