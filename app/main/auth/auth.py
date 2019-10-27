@@ -4,11 +4,12 @@ from functools import wraps
 from jose import jwt
 from jose.exceptions import JWTError
 from urllib.request import urlopen
+import os
 
 
-AUTH0_DOMAIN = 'fremfi.auth0.com'
-ALGORITHMS = ['RS256']
-API_AUDIENCE = 'castingagencyauth'
+AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN')
+ALGORITHMS = os.getenv('ALGORITHMS')
+API_AUDIENCE = os.getenv('API_AUDIENCE')
 
 
 class AuthError(Exception):
