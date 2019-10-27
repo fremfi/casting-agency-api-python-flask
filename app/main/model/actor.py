@@ -1,6 +1,7 @@
 from .. import db
 from sqlalchemy import Column, String, Integer, DateTime, Enum
 from app.main.exceptions import ValidationError
+from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 import enum
 
@@ -56,20 +57,38 @@ class Actor(db.Model):
         self._gender = gender
 
     def insert(self):
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            raise
+        finally:
+            db.session.close()
 
     def update(self):
-        db.session.commit()
+        try:
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            raise
+        finally:
+            db.session.close()
 
     def delete(self):
-        db.session.delete(self)
-        db.session.commit()
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            raise
+        finally:
+            db.session.close()
 
     def format(self):
         return {
           'id': self._id,
           'name': self._name,
           'age': self._age,
-          'gender': self._gender.name
+          'gender': self._gender
         }

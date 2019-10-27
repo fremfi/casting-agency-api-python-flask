@@ -70,7 +70,7 @@ class ActorList(Resource):
                 "status": 400,
                 "description": exc.error
             })
-        except (DBAPIError, SQLAlchemyError):
+        except SQLAlchemyError:
             abort(500)
 
         return actor.format(), 201
@@ -119,7 +119,7 @@ class Actor(Resource):
                     "description": "Actor with id " +
                     actor_id + " was not found"
                 })
-        except (DBAPIError, SQLAlchemyError):
+        except SQLAlchemyError:
             abort(500)
         return '', 204
 

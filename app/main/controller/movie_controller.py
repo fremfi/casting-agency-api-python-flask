@@ -1,7 +1,7 @@
 import app.main.service
 from flask import request
 from flask_restplus import abort
-from sqlalchemy.exc import SQLAlchemyError, DBAPIError
+from sqlalchemy.exc import SQLAlchemyError
 from app.main.service import movie_service
 from app.main.exceptions import ValidationError
 from flask_restplus import Resource
@@ -68,7 +68,7 @@ class MovieList(Resource):
                 "status": 400,
                 "description": exc.error
             })
-        except (DBAPIError, SQLAlchemyError):
+        except SQLAlchemyError:
             abort(500)
 
         return movie.format(), 201
@@ -117,7 +117,7 @@ class Movie(Resource):
                     "description": "Movie with id " +
                     movie_id + " was not found"
                 })
-        except (DBAPIError, SQLAlchemyError):
+        except SQLAlchemyError:
             abort(500)
         return '', 204
 

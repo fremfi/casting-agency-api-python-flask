@@ -93,21 +93,18 @@ def verify_decode_jwt(token):
             return payload
 
         except jwt.ExpiredSignatureError:
-            print('expired')
             raise AuthError({
                 'code': 'token_expired',
                 'description': 'Token expired.'
             }, 401)
 
         except jwt.JWTClaimsError:
-            print('claims')
             raise AuthError({
                 'code': 'invalid_claims',
                 'description': 'Incorrect claims. Please, ' +
                                'check the audience and issuer.'
             }, 401)
         except Exception as e:
-            print(e)
             raise AuthError({
                 'code': 'invalid_header',
                 'description': 'Unable to parse authentication token.'
@@ -125,8 +122,6 @@ def requires_auth(permission=''):
             try:
                 token = get_token_auth_header()
                 payload = verify_decode_jwt(token)
-                print("payload below")
-                print(payload)
             except (JWTError, AuthError):
                 abort(401)
             check_permissions(permission, payload)

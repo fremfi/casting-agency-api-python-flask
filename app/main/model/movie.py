@@ -1,6 +1,7 @@
 from .. import db
 from sqlalchemy import Column, String, Integer, DateTime
 from app.main.exceptions import ValidationError
+from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 
 
@@ -41,19 +42,37 @@ class Movie(db.Model):
         self._release_date = release_date
 
     def insert(self):
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            raise
+        finally:
+            db.session.close()
 
     def update(self):
-        db.session.commit()
+        try:
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            raise
+        finally:
+            db.session.close()
 
     def delete(self):
-        db.session.delete(self)
-        db.session.commit()
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            raise
+        finally:
+            db.session.close()
 
     def format(self):
         return {
           'id': self._id,
           'title': self._title,
-          'release_date': self._release_date.strftime("%Y-%m-%d")
+          'release_date': self._release_date
         }
