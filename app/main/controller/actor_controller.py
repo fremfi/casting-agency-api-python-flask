@@ -1,7 +1,7 @@
 import app.main.service
 from flask import request
 from flask_restplus import abort
-from sqlalchemy import exc
+from sqlalchemy.exc import SQLAlchemyError, DBAPIError
 from app.main.service import actor_service
 from app.main.exceptions import ValidationError
 from flask_restplus import Resource
@@ -70,7 +70,7 @@ class ActorList(Resource):
                 "status": 400,
                 "description": exc.error
             })
-        except exc.SQLAlchemyError:
+        except (DBAPIError, SQLAlchemyError):
             abort(500)
 
         return actor.format(), 201
@@ -119,7 +119,7 @@ class Actor(Resource):
                     "description": "Actor with id " +
                     actor_id + " was not found"
                 })
-        except exc.SQLAlchemyError:
+        except (DBAPIError, SQLAlchemyError):
             abort(500)
         return '', 204
 
