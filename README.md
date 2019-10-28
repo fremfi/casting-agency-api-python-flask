@@ -1,5 +1,7 @@
 # Casting Agency API
 
+The Casting Agency api models a company that is responsible for creating movies and managing and assigning actors to those movies. This system helps simplify and streamline the process.
+
 ## Getting Started
 
 ### Installing Dependencies
@@ -59,6 +61,6 @@ This will install all of the required packages we selected within the `requireme
 - https://fremfi.auth0.com/v2/logout?client_id=UxNviyb8tyHeh1dI0Xsk29jz06dQETea&returnTo=https://fremfi-casting-agency.herokuapp.com/logout
 
 ##### Users, Roles & Passwords for testing
-- Executive Producer; exectuvieproducer@fremfi.com Executive2@
+- Executive Producer; executiveproducer@fremfi.com Executive2@
 - Casting Assistant; castingassistant@fremfi.com Casting2@
 - Casting Director; castingdirector@fremfi.com Director2@

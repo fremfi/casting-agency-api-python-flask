@@ -11,7 +11,7 @@ from app.main.controller import movie_controller
 from app.main.controller import actor_controller
 from app import blueprint
 
-app = create_app(os.getenv('CREATIVE_AGENCY_ENV') or 'dev')
+app = create_app(os.getenv('FLASK_ENV') or 'development')
 app.register_blueprint(blueprint)
 app.app_context().push()
 

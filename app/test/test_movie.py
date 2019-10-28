@@ -4,9 +4,11 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 from app.main.controller import movie_controller
 
-from app.main import create_app
+from app.main import create_app, db
 from app.main.model.movie import Movie
 from app import blueprint
+import requests
+import os
 
 
 class MovieTestCase(unittest.TestCase):
@@ -14,18 +16,40 @@ class MovieTestCase(unittest.TestCase):
 
     def setUp(self):
         """Define test variables and initialize app."""
-        self.app = create_app('test')
+        self.app = create_app('testing')
         self.app.register_blueprint(blueprint)
         self.client = self.app.test_client
-        # Executive Director Role Token
-        self.exec_dir_headers = {'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik1qWTNOalV4TnpCRE1FWXpRalJEUTBRelF6VkRSVGMwUWpNM1F6aEVRak01TnpBM1JqVXpRdyJ9.eyJpc3MiOiJodHRwczovL2ZyZW1maS5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWRiNGM0NjBlOWMwNzQwZDYxMzczYWQ5IiwiYXVkIjoiY2FzdGluZ2FnZW5jeWF1dGgiLCJpYXQiOjE1NzIxOTQ4OTMsImV4cCI6MTU3MjIwMjA5MywiYXpwIjoiVXhOdml5Yjh0eUhlaDFkSTBYc2syOWp6MDZkUUVUZWEiLCJzY29wZSI6IiIsInBlcm1pc3Npb25zIjpbImNyZWF0ZTphY3RvciIsImNyZWF0ZTptb3ZpZSIsImRlbGV0ZTphY3RvciIsImRlbGV0ZTptb3ZpZSIsImdldDphY3RvcnMiLCJnZXQ6bW92aWVzIiwidXBkYXRlOmFjdG9yIiwidXBkYXRlOm1vdmllIl19.jix7dg9B4zjTOFe4NIupkVxAHTWVdGObQvwLgidLeQBp2A08I4sLjEj6bo7nSEmQy-4L10QiTvTHvNCcY0KIkPVk6Amjhsu5XgnM3mKJma2jRYEuRefnxBei8qg0jNaR5xCHsfbvcZFQ69k99AkP-6qwMZ1hszKvXTaLunsssG13Y-QojTLSSvDAY6gNN4VP9NI-SqO_DXoo_pete3Qo6FbunlLuJAJnYnBpVKUwwOcHacO3b0lYOEHHMlyxfz23_tu4Z-gWH5mrUEdBA_8f7zYlFY1YKbAaFlv8vGXjWTFGYxpRLqwSkZicdBn7dSJmyQrpmZtea3LngOlNamdOaA'}  # nopep8
 
         with self.app.app_context():
-            self.db = SQLAlchemy()
-            self.db.init_app(self.app)
+            db.create_all()
+            db.session.commit()
+            self.populate_db()
+
+        AUTH0_DOMAIN = os.environ['AUTH0_DOMAIN']
+        res = (requests.post(url='https://' + AUTH0_DOMAIN + '/oauth/token',
+                data={
+                    "grant_type": "client_credentials",
+                    "client_id": "uqxA7Rj5RK1BcZ4edFpdNoxAy9VNq8vS",
+                    "client_secret": "vmYihu3sQ-XC4jCCI19VTmUGxvfDNF-mgjS_XrdmBGcpKvnT1L4gw2hZXAOOIZrm",  # nopep8
+                    "audience": "castingagencyauth"
+                }))
+        access_token = res.json()['access_token']
+        self.auth_header = {'Authorization': 'Bearer ' + access_token}
+
+    def tearDown(self):
+        with self.app.app_context():
+            db.session.remove()
+            db.drop_all()
+
+    def populate_db(self):
+        movie = Movie(
+            title="Joker",
+            release_date="2019-10-04"
+        )
+        movie.insert()
 
     def test_get_movies(self):
-        res = self.client().get('/movies/', headers=self.exec_dir_headers)
+        res = self.client().get('/movies/', headers=self.auth_header)
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -33,7 +57,7 @@ class MovieTestCase(unittest.TestCase):
 
     def test_404_sent_requesting_beyond_valid_movies_page(self):
         res = (self.client().get('/movies?page=1000',
-               headers=self.exec_dir_headers,
+               headers=self.auth_header,
                follow_redirects=True))
         data = json.loads(res.data)
 
@@ -46,7 +70,7 @@ class MovieTestCase(unittest.TestCase):
             "title": "Test Movie"
         }
         res = (self.client().post('/movies/', json=new_movie,
-               headers=self.exec_dir_headers))
+               headers=self.auth_header))
         data = json.loads(res.data)
 
         movie = Movie.query.filter(Movie.title == new_movie["title"]).first()
@@ -55,7 +79,7 @@ class MovieTestCase(unittest.TestCase):
         self.assertEqual(data['title'], new_movie["title"])
 
     def test_400_sent_if_posted_question_isnt_formatted_correctly(self):
-        res = (self.client().post('/movies/', headers=self.exec_dir_headers,
+        res = (self.client().post('/movies/', headers=self.auth_header,
                json={
                     "release_date": "2019-10-04",
                     "title": ""
@@ -73,27 +97,24 @@ class MovieTestCase(unittest.TestCase):
             "title": "New Test Movie"
         }
         res = (self.client().patch('/movies/1',
-               headers=self.exec_dir_headers, json=updated_movie))
+               headers=self.auth_header, json=updated_movie))
         data = json.loads(res.data)
 
-        movie = Movie.query.filter(Movie._id == 1).first()
-
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(movie.title, updated_movie["title"])
         self.assertEqual(data['title'], updated_movie["title"])
 
     def test_delete_movie(self):
-        res = (self.client().delete('/movies/2',
-               headers=self.exec_dir_headers))
+        res = (self.client().delete('/movies/1',
+               headers=self.auth_header))
 
-        movie = Movie.query.filter(Movie._id == 2).one_or_none()
+        movie = Movie.query.filter(Movie._id == 1).one_or_none()
 
         self.assertEqual(res.status_code, 204)
         self.assertEqual(movie, None)
 
     def test_404_sent_if_question_being_deleted_does_not_exist(self):
         res = (self.client().delete('/movies/1000',
-               headers=self.exec_dir_headers))
+               headers=self.auth_header))
 
         self.assertEqual(res.status_code, 404)
 
