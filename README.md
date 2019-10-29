@@ -18,6 +18,7 @@ We recommend working within a virtual environment whenever using Python for proj
 With Postgres running, run the following command to create a new database for the project:
 ```bash
 createdb casting-agency
+createdb casting-agency-test
 ```
 
 #### Export Environment Variables
